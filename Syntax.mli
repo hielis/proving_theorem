@@ -24,4 +24,6 @@ val false_formula : unit -> formula
 
 val is_equal : formula -> formula -> boolean
 val contains_formula : formula -> formula list -> boolean
+
+val print_formula_list : formula list -> unit
 end

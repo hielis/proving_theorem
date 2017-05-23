@@ -1,12 +1,12 @@
-open Syntax
-
+open Syntax.SYNTAX
 
 module KERNEL : sig
 type sequent = {
-left : SYNTAX.formula list ;
-right : SYNTAX.formula list}
+left : Syntax.SYNTAX.formula list ;
+right : formula list}
 type theorem
 exception Invalid
+val print_sequent : sequent -> unit
 val _rev : 'a list -> 'a list -> 'a list
 val conclusion : theorem -> sequent
 val sel_left : theorem -> pos:int -> principal:SYNTAX.formula -> theorem (*done*)
