@@ -5,8 +5,14 @@ type sequent = {
 left : Syntax.SYNTAX.formula list ;
 right : formula list}
 type theorem
+type proofTree
 exception Invalid
 val print_sequent : sequent -> unit
+
+val computeUnary : string -> theorem -> proofTree -> proofTree
+val computeBinary : string -> theorem -> proofTree -> proofTree -> proofTree
+val leaf : unit -> proofTree
+
 val _rev : 'a list -> 'a list -> 'a list
 val conclusion : theorem -> sequent
 val sel_left : theorem -> pos:int -> principal:SYNTAX.formula -> theorem (*done*)

@@ -6,16 +6,22 @@ type sequent = {left : formula list; right : formula list};;
 
 type theorem = sequent;; (*suggestion du sujet, feel free to choose better*)
 
+type proofTree = |Leaf |Unary of string * theorem * proofTree |Binary of string * theorem * proofTree * proofTree
+
 exception Invalid;;
 
 let print_sequent ccl  =
-(  Pervasives.print_string "{left = ";
-    print_formula_list ccl.left;
-   Pervasives.print_string " ; "; Pervasives.print_string "right = ";
+(  print_formula_list ccl.left;
+   Pervasives.print_string " |-- ";
 print_formula_list ccl.right;
- Pervasives.print_string " }";
 Pervasives.print_newline ();)
 ;;
+
+let computeUnary s th t = Unary(s,th,t);;
+
+let computeBinary s th t1 t2 = Binary(s,th,t1,t2);;
+
+let leaf () = Leaf;;
 
 let rec _rev acc = function [] -> acc | b::tl -> _rev (b::acc) tl;;
 let rev = _rev [];;

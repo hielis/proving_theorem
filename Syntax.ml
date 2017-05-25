@@ -39,25 +39,36 @@ let rec contains_formula f = function
   |t::q->(is_equal t f) || (contains_formula f q)
 ;;
 
+let rec print_term = function
+  |Variable(s)-> Pervasives.print_string ("Var("^(s^")"))
+  |Constant(s)-> Pervasives.print_string ("Cons("^(s^")"))
+  |Operator(s,l)-> (Pervasives.print_string (s^"("); print_term_list l; Pervasives.print_string ")")
+and  _print_tl_aux = function
+  |[]->()
+  |t::q->(Pervasives.print_string " , "; print_term t; _print_tl_aux q)
+and print_term_list = function
+     |[]->()
+     |t::q->(print_term t; _print_tl_aux q)
+;;
+
 let rec print_formula = function
-Predicate(s,_)->Pervasives.print_string s
-  |Or(f1,f2)->(Pervasives.print_string "Or(";print_formula f1; Pervasives.print_string ","; print_formula f2; Pervasives.print_string ")")
-  |And(f1,f2)->(Pervasives.print_string "And(";print_formula f1; Pervasives.print_string ","; print_formula f2; Pervasives.print_string ")")
-  |Implies(f1,f2)->(Pervasives.print_string "Implies(";print_formula f1; Pervasives.print_string ","; print_formula f2; Pervasives.print_string ")")
+Predicate(s,l)->(Pervasives.print_string (s^"("); print_term_list l; Pervasives.print_string ")")
+  |Or(f1,f2)->(Pervasives.print_string "(";print_formula f1; Pervasives.print_string " or "; print_formula f2; Pervasives.print_string ")")
+  |And(f1,f2)->(Pervasives.print_string "(";print_formula f1; Pervasives.print_string " and "; print_formula f2; Pervasives.print_string ")")
+  |Implies(f1,f2)->(Pervasives.print_string "(";print_formula f1; Pervasives.print_string " ==> "; print_formula f2; Pervasives.print_string ")")
   |True->Pervasives.print_string "True" |False->Pervasives.print_string "False"
+  |Forall(s,f)->(Pervasives.print_string ("[Forall "^(s^", ")); print_formula f; Pervasives.print_string "]")
+  |Exists(s,f)->(Pervasives.print_string ("[Exists "^(s^", ")); print_formula f; Pervasives.print_string "]")
 ;;
 
-let rec _print_aux = function
-  |[]->Pervasives.print_string "]";
-  |t::q->(Pervasives.print_string " ; "; print_formula t; _print_aux q)
+let rec _print_fl_aux = function
+  |[]->()
+  |t::q->(Pervasives.print_string " , "; print_formula t; _print_fl_aux q)
 ;;
 
-let print_formula_list l =
-(Pervasives.print_string "[";
-match l with
-|[]->Pervasives.print_string "]";
-|t::q->(print_formula t; _print_aux q);)
-
+let print_formula_list = function
+|[]->Pervasives.print_string "()";
+|t::q->(print_formula t; _print_fl_aux q)
 ;;
 
 
