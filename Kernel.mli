@@ -5,21 +5,15 @@ type sequent = {
 left : Syntax.SYNTAX.formula list ;
 right : formula list}
 type theorem
-type proofTree
 exception Invalid
-val print_sequent : sequent -> unit
-
-val computeUnary : string -> theorem -> proofTree -> proofTree
-val computeBinary : string -> theorem -> proofTree -> proofTree -> proofTree
-val leaf : unit -> proofTree
 
 val _rev : 'a list -> 'a list -> 'a list
 val conclusion : theorem -> sequent
-val sel_left : theorem -> pos:int -> principal:SYNTAX.formula -> theorem (*done*)
-val sel_right : theorem -> pos:int -> principal:SYNTAX.formula -> theorem (*done*)
+val sel_left : theorem -> int -> SYNTAX.formula -> theorem (*done*)
+val sel_right : theorem ->int -> SYNTAX.formula -> theorem (*done*)
 
-val init_left : sequent -> principal:SYNTAX.formula -> theorem
-val init_right : sequent -> principal:SYNTAX.formula -> theorem
+val init_left : sequent -> SYNTAX.formula -> theorem
+val init_right : sequent -> SYNTAX.formula -> theorem
 
 val and_left : theorem -> theorem * SYNTAX.formula (*done*)
 val and_right : theorem -> theorem -> theorem * SYNTAX.formula (*done*)

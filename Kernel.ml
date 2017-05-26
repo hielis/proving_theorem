@@ -6,22 +6,10 @@ type sequent = {left : formula list; right : formula list};;
 
 type theorem = sequent;; (*suggestion du sujet, feel free to choose better*)
 
-type proofTree = |Leaf |Unary of string * theorem * proofTree |Binary of string * theorem * proofTree * proofTree
 
 exception Invalid;;
 
-let print_sequent ccl  =
-(  print_formula_list ccl.left;
-   Pervasives.print_string " |-- ";
-print_formula_list ccl.right;
-Pervasives.print_newline ();)
-;;
-
-let computeUnary s th t = Unary(s,th,t);;
-
-let computeBinary s th t1 t2 = Binary(s,th,t1,t2);;
-
-let leaf () = Leaf;;
+let conclusion (t: theorem) = (t:sequent);;
 
 let rec _rev acc = function [] -> acc | b::tl -> _rev (b::acc) tl;;
 let rev = _rev [];;
@@ -41,19 +29,19 @@ let sel_right th pos principal = if (pos < ((List.length th.right) +1)) then
                                    {right = l; left = th.left}
                                  else failwith "InvalidSelRight";;
 
-let and_left th = (print_sequent th; match th.left with [] -> failwith "InvalidAndL" |a::[] -> failwith "InvalidANdL"
-                                     |a::b::tl -> ({left = tl ; right = th.right}, and_formula a b));;
+let and_left th = match th.left with [] -> failwith "InvalidAndL" |a::[] -> failwith "InvalidANdL"
+                                     |a::b::tl -> ({left = tl ; right = th.right}, and_formula a b);;
 
-let and_right th1 th2 = (print_sequent th1; print_sequent th2; match th1.right, th2.right with [],_->failwith "InvalidANdR" |_,[]->failwith "InvalidAndR"
-                                                       |a::tl1,b::tl2->({left = th1.left; right = tl1}, and_formula a b));;
-
-
-let or_left th1 th2 = (print_sequent th1; print_sequent th2; match th1.left, th2.left with [],_->failwith "InvalidOrL" |_,[]->failwith "InvalidOrL"
-                                                    |a::tl1,b::tl2->({left = tl1; right = th1.right}, or_formula a b));;
+let and_right th1 th2 = match th1.right, th2.right with [],_->failwith "InvalidANdR" |_,[]->failwith "InvalidAndR"
+                                                       |a::tl1,b::tl2->({left = th1.left; right = tl1}, and_formula a b);;
 
 
-let or_right th =(print_sequent th;  match th.right with [] -> failwith "InvalidOrR" |a::[] -> failwith "InvalidOrR"
-                                          |a::b::tl ->({left = th.left; right = tl}, or_formula a b));;
+let or_left th1 th2 = match th1.left, th2.left with [],_->failwith "InvalidOrL" |_,[]->failwith "InvalidOrL"
+                                                    |a::tl1,b::tl2->({left = tl1; right = th1.right}, or_formula a b);;
+
+
+let or_right th = match th.right with [] -> failwith "InvalidOrR" |a::[] -> failwith "InvalidOrR"
+                                          |a::b::tl ->({left = th.left; right = tl}, or_formula a b);;
 
 
 let true_left th = (th, true_formula ());;
@@ -75,8 +63,6 @@ let implies_left th1 th2 = match th1.right, th2.left with [],_->failwith "Invali
 let implies_right th = match th.left, th.right with [],_->failwith "InvalidIR1" |_,[]->failwith "InvalidIR2"
                                                           |a::tl1,b::tl2->({left=tl1;right=tl2},implies_formula a b)
 ;;
-
-let conclusion th = th;;
 
 end
 
