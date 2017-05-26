@@ -1,7 +1,6 @@
-open KERNEL
-open PRINTER
-open GENERICS
-open FOREST
+open Kernel.KERNEL
+open Forest.FOREST
+open Generics.GENERICS
 
 module PROOFSEARCH = struct
 
@@ -9,8 +8,7 @@ exception Fail
 
 
 let rec search conclusion bound =
-(print_sequent conclusion;
-  if (bound<0) then (Pervasives.print_string "Neg Bound";Pervasives.print_newline (); raise Fail;)
+  if (bound<0) then raise Fail
     else
        let rec try_right_principal i l = function
         |[]->raise Fail
@@ -80,7 +78,7 @@ let rec search conclusion bound =
                                  in search_aux {left=l_aux; right = f1::conclusion.right} (bound-1) succeed1 fail
                |_->fail ()
 
-     in try_left_principal 0 [] conclusion.left)
+     in try_left_principal 0 [] conclusion.left
 
 and search_aux conclusion bound succeed fail =
   try let (th,tree) = search conclusion bound in succeed th tree with Fail->fail () ;;
@@ -94,14 +92,14 @@ let s6 = {left=[]; right=[Implies(Implies(And(Predicate("p",[]),Predicate("q",[]
 let s7 = {left = []; right=[Implies(Or(And(Predicate("p1",[]),Predicate("q1",[])),And(Predicate("p2",[]),Predicate("q2",[]))),And(Or(Predicate("p1",[]),Predicate("p2",[])),Or(Predicate("q1",[]),Predicate("q2",[]))))]};;
 
 let main () = let a = {left = [True]; right = [False]} in
-                let rec aux i = try (search s2 i) with Fail->(Pervasives.print_string "Failed"; Pervasives.print_newline ();if i<1000 then aux (i+1) else ({left=[];right=[]}, leaf () )) in let (th,tree) = aux 0 in tree_to_latex tree;;
+                let rec aux i = try (search s6 i) with Fail->if i<1000 then aux (i+1) else (null_theorem (), leaf ()) in let (th,tree) = aux 0 in tree_to_latex tree;;
 
 end;;
 
 PROOFSEARCH.main ();;
 
-tree_to_latex (Unary("$\\forall$ L", {left = [Predicate("p",[])]; right = [False;Predicate("p",[]);Forall("x",Predicate("P",[Variable("x")]))]},Leaf));;
+(*tree_to_latex (Unary("$\\forall$ L", {left = [Predicate("p",[])]; right = [False;Predicate("p",[]);Forall("x",Predicate("P",[Variable("x")]))]},Leaf));;
 
 search  {left = [Predicate("p",[])]; right = [False;Predicate("p",[])]} 100;;
 
-contains_formula (Predicate("p",[])) ([False;Predicate("p",[])]);;
+contains_formula (Predicate("p",[])) ([False;Predicate("p",[])]);;*)

@@ -1,9 +1,11 @@
 module SYNTAX : sig
-type term = private
+
+type term = (*private*)
 | Variable of string
 | Constant of string
 | Operator of string * term list
-type formula = private
+
+type formula = (*private*)
 | Predicate of string * term list
 | And of formula * formula | True
 | Or of formula * formula | False
@@ -21,8 +23,5 @@ val implies_formula : formula -> formula -> formula
 
 val true_formula : unit -> formula
 val false_formula : unit -> formula
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/master
 end

@@ -1,5 +1,5 @@
-open SYNTAX
-open KERNEL
+open Syntax.SYNTAX
+open Kernel.KERNEL
 
 module PRINTER = struct
 

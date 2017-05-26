@@ -2,7 +2,7 @@ open Syntax.SYNTAX
 
 module GENERICS : sig
 
-val is_equal : SYNTAX.formula -> SYNTAX.formula -> boolean
-val contains_formula : SYNTAX.formula -> SYNTAX.formula list -> boolean
+val is_equal : formula -> formula -> bool
+val contains_formula : formula -> formula list -> bool
 
 end

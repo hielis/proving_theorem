@@ -1,9 +1,9 @@
-open KERNEL
-open PRINTER
+open Kernel.KERNEL
+open Printer.PRINTER
 
 module FOREST = struct
 
-type proofTree = |Leaf |Unary of string * KERNEL.theorem * proofTree |Binary of string * KERNEL.theorem * proofTree * proofTree
+type proofTree = |Leaf |Unary of string * theorem * proofTree |Binary of string * theorem * proofTree * proofTree
 
 let computeUnary s th t = Unary(s,th,t);;
 
@@ -18,7 +18,7 @@ let rec _ttl_aux = function
 ;;
 
 let tree_to_latex tree =
-  let head = "\\documentclass[12pt]{article} \\usepackage{bussproofs} \\usepackage{amssymb} \\usepackage{latexsym} \\begin{document} \\begin{prooftree} " in
+  let head = "\\documentclass[10pt]{article} \\usepackage{bussproofs} \\usepackage{amssymb} \\usepackage{latexsym} \\begin{document} \\begin{prooftree} " in
   let tail = " \\end{prooftree} \\end{document}" in
   let latex_code = (head ^ (_ttl_aux tree))^tail in
   let latex_file = open_out "output/proof.tex" in

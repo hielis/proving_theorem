@@ -1,4 +1,4 @@
-open SYNTAX
+open Syntax.SYNTAX
 
 module GENERICS = struct
 
