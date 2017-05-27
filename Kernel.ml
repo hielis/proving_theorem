@@ -1,6 +1,7 @@
 
 open Syntax.SYNTAX
 
+
 module KERNEL = struct
 
 type sequent = {left : formula list; right : formula list};;
@@ -9,6 +10,7 @@ type theorem = sequent;; (*suggestion du sujet, feel free to choose better*)
 
 
 exception Invalid;;
+exception UnificationImpossible;;
 
 let conclusion (t: theorem) = (t:sequent);;
 
@@ -68,5 +70,38 @@ let implies_right th = match th.left, th.right with [],_->failwith "InvalidIR1" 
                                                           |a::tl1,b::tl2->({left=tl1;right=tl2},implies_formula a b)
 ;;
 
-end
+let rec concat_or b = function
+  |[] -> b
+  |hd::tl -> concat_or (b || hd) tl;;
 
+
+let rec is_present_in s = function
+  |Variable(sp) -> String.equal sp s
+  |Constant(sp) -> false
+  |Operator(sp, l) -> concat_or false (List.map (is_present_in s) l);;
+
+let rec unify_term a t = match a, t with
+  |Variable(s), _ when (is_present_in s t) -> raise UnificationImpossible
+  |Variable(s),_ -> (s, t)
+  |_, Variable(s) -> (s, a)
+  |_, _ -> raise UnificationImpossible;;
+
+let unify_formula f1 f2 =
+  let rec aux acc l1 l2 = match l1, l2 with
+    |[], [] -> acc
+    |t1::tl1, t2::tl2 -> (try (aux ((unify_term t1 t2)::acc) tl1 tl2) with _ -> aux acc tl1 tl2)
+    |_,_ -> failwith "Predicates arguments are ill-sized" in
+let rec aux2 f1 f2 =
+  match f1, f2 with
+  |Predicate(s1, l1), Predicate(s2, l2) when (not (String.equal s1 s2)) -> raise UnificationImpossible
+  |Predicate(s1, l1), Predicate(s2, l2) -> aux [] l1 l2
+  |_ -> failwith "Reduction failed and Unification was called too soon" in
+
+let rec aux3 f1 f2 = function
+  |[] -> (f1, f2)
+  |hd::tl -> let (s, t) = hd in
+             aux3 (replace_formula s t f1) (replace_formula s t f2) tl in
+
+aux3 f1 f2 (List.rev (aux2 f1 f2));;
+
+end

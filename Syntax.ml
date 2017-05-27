@@ -1,5 +1,7 @@
 module SYNTAX = struct
 
+exception UnificationImpossible
+
 type term =
 | Variable of string
 | Constant of string
@@ -24,5 +26,23 @@ let implies_formula f1 f2 = match f1,f2 with False, _ -> True | True, True -> Tr
 
 let true_formula () = True;;
 let false_formula () = False;;
+
+let rec replace_term s t = function
+  |Variable(sp) when (String.equal s sp) -> t
+  |Variable(sp) -> Variable(sp)
+  |Constant(sp) -> Constant(sp)
+  |Operator(sp, l) -> Operator(sp, List.map (replace_term s t) l);;
+
+let rec replace_formula s t = function
+  |Predicate(sp, l) -> Predicate(sp, List.map (replace_term s t) l)
+  |And(f1, f2) -> And(replace_formula s t f1, replace_formula s t f2)
+  |Or(f1, f2) -> Or(replace_formula s t f1, replace_formula s t f2)
+  |Implies(f1, f2) -> Implies(replace_formula s t f1, replace_formula s t f2)
+  |True -> True
+  |False -> False
+  |Exists(sp, f) when (String.equal s sp) -> raise UnificationImpossible
+  |Exists(sp, f) -> Exists(sp, replace_formula s t f)
+  |Forall(sp, f) when (String.equal s sp) -> raise UnificationImpossible
+  |Forall(sp, f) -> Forall(sp, replace_formula s t f);;
 
 end

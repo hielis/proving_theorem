@@ -6,7 +6,9 @@ type sequent = {
 left : formula list ;
 right : formula list}
 type theorem
+
 exception Invalid
+exception UnificationImpossible
 
 val null_theorem : unit -> theorem
 
@@ -32,5 +34,8 @@ val or_right : theorem -> theorem * formula (*done*)
 
 val implies_left : theorem -> theorem -> theorem * formula
 val implies_right : theorem -> theorem * formula
+
+val unify_term : term -> term -> term
+val unify_formula : formula -> formula -> formula
 
 end
