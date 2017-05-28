@@ -1,6 +1,9 @@
 open Kernel.KERNEL
 open Forest.FOREST
 open Generics.GENERICS
+open Unification.UNIFICATION
+open Replacements.REPLACEMENT
+
 
 module PROOFSEARCH = struct
 
@@ -41,6 +44,14 @@ let rec search conclusion bound =
                                    in let th = sel_right a i b
                                    in (th, computeUnary "$\\Rightarrow$ R" th tree)
                                 in search_aux {left= f1::conclusion.left; right = f2::(_rev q l)} (bound-1) succeed fail
+               |Exists(s, f)-> let fp, lp = replace_term_by_variable_in_formula s (Variable(String.capitalize_ascii s)) f in
+                               let succeed ccl tree = 
+                                 let r s f = replacement_by_positions (Variable(s)) f lp in
+                                 let (a, b) = exists_right r ccl s in
+                                 let th = sel_right a i b in
+                                 (th, computeUnary "$\\exists$ R" th tree)
+                               in search_aux {left = conclusion.left ; right = fp::(_rev q l)} (bound -1) succeed fail
+               |Predicate(s, f)-> fail () (*Unification Needed*)
                |_->fail ()
 
 
@@ -76,6 +87,14 @@ let rec search conclusion bound =
                                        in let th = sel_left a i b in (th, computeBinary "$\\Rightarrow$ L" th tree1 tree2)
                                     in search_aux {left= f2::l_aux; right = conclusion.right} (bound-1) succeed2 fail
                                  in search_aux {left=l_aux; right = f1::conclusion.right} (bound-1) succeed1 fail
+               |Forall(s, f) -> let l_aux = (_rev q l) in
+                                let fp, lp = replace_term_by_variable_in_formula s (Variable(String.capitalize_ascii s)) f in
+                                let succeed ccl tree = 
+                                  let r s f = replacement_by_positions (Variable(s)) f lp in
+                                  let (a, b) = exists_right r ccl s in
+                                  let th = sel_left a i b in (th, computeUnary "$\\forall& L" th tree)
+                                in search_aux {left = fp::l_aux; right = conclusion.right} (bound-1) succeed fail
+               |Predicate(s, l) -> fail () (*Unification needed*)
                |_->fail ()
 
      in try_left_principal 0 [] conclusion.left

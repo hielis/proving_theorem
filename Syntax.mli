@@ -26,7 +26,4 @@ val implies_formula : formula -> formula -> formula
 val true_formula : unit -> formula
 val false_formula : unit -> formula
 
-val replace_term : string -> term -> term -> term
-val replace_formula : string -> term -> formula -> formula
-
 end
