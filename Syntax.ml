@@ -3,6 +3,7 @@ module SYNTAX = struct
 exception UnificationImpossible
 
 type term =
+| Meta of string * string list
 | Variable of string
 | Constant of string
 | Operator of string * term list;;
@@ -17,6 +18,9 @@ type formula =
 
 let predicate s l  = Predicate(s , l);; (*Juste pour pouvoir compiler ; A IMPLEMENTER*)
 let operator s l = Operator(s, l);;
+let constant s = Constant(s);;
+let variable s = Variable(s);;
+let meta s l = Meta(s, l);;
 
 (*J'ai implementé les regles de De Morgan par defaut, je ne sais pas si c'est vraiment utile*)
 

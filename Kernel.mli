@@ -35,15 +35,12 @@ val or_right : theorem -> theorem * formula
 val implies_left : theorem -> theorem -> theorem * formula
 val implies_right : theorem -> theorem * formula
 
-val exists_right : (string -> formula -> formula) -> sequent -> string -> sequent * formula
+val exists_right : (string -> formula -> formula) -> theorem -> string -> theorem * formula
+val forall_left : (string -> formula -> formula) -> theorem -> string -> theorem * formula
+val exists_left : (string -> formula -> formula) -> theorem -> string -> theorem * formula
+val forall_right : (string -> formula -> formula) -> theorem -> string -> theorem * formula
 
 
-val forall_left : (string -> formula -> formula) -> sequent -> string -> sequent * formula
-
-(*
-val exists_left : theorem -> string -> string -> theorem
-val forall_right : theorem -> string -> string -> theorem
-*)
 
 
 end

@@ -5,8 +5,28 @@ val hash : int -> int -> int
 val replace_term_by_variable_in_formula : string -> term -> formula -> formula * ((int * int * int) list)
 val replace_term_by_position_in_formula : (int * int * int) -> term -> formula -> formula
 val replacement_by_positions : term -> formula -> (int * int * int) list -> formula
+val list_of_constants : formula list -> string list
 end
 = struct
+
+
+
+let list_of_constants l =
+  let rec aux1 = function
+    |Constant(s)-> [s]
+    |Operator(s, l)-> List.flatten (List.map aux1 l)
+    |_ -> []
+  in
+  let rec aux2 = function |True-> [] | False-> []
+                          |Predicate(_, l)-> List.flatten (List.map aux1 l)
+                          |Exists(_,f)-> aux2 f
+                          |Forall(_,f)-> aux2 f
+                          |And(f1, f2)-> (aux2 f1)@(aux2 f2)
+                          |Or(f1, f2)-> (aux2 f1)@(aux2 f2)
+                          |Implies(f1, f2)-> (aux2 f1)@(aux2 f2)
+  in
+  List.flatten (List.map aux2 l);;
+
 
 
 type tree = F of int | N of int * (tree list);;
@@ -28,15 +48,18 @@ let rec split l1 l2 = function [] -> (List.rev l1, l2) | (a, b)::tl -> split (a:
 let rec loop_term i j = function
   |Constant(s)-> F(hash i j)
   |Variable(s)-> F(hash i j)
+  |Meta(s, _) -> F(hash i j)
   |Operator(s, l)-> N(hash i j, on_list i 0 l)
 and on_list i acc = function [] -> [] | a::tl -> (loop_term i acc a)::(on_list i (acc + 1) tl);;
 
-let replace_term_in_term m mp s t1 t2 =
+let replace_term_in_term s m mp t1 t2 =
   let tree = loop_term 0 0 t2 in
   let rec aux1 fp t = match fp, t with
     |Constant(s1), F(n) -> (Constant(s1), [])
     |Variable(s1), F(n) when (String.equal s1 s) -> (t1, [(m, mp, n)])
     |Variable(s1), F(n)-> (Variable(s1), [])
+    |Meta(s1, _), F(n) when (String.equal s1 s) -> (t1, [(m, mp, n)])
+    |Meta(s1, _), F(n)-> (Variable(s1), [])
     |Operator(s1, l1), N(n, l2)-> let l = List.map2 aux1 l1 l2 in
                                   let l3, l4 = split [] [] l in
                                   (Operator(s1, l3), l4)
@@ -47,7 +70,7 @@ let replace_term_by_variable_in_formula s t f =
   let t1 = loop 0 0 f in
   let rec aux1 fp tp = match fp, tp with
     |True, _-> (True, []) |False, _ -> (False, [])
-    |Predicate(s1, l), F(n)-> let rec aux2 i acc1 acc2 = function []-> (List.rev acc1, acc2) |a::tl-> let a, b = replace_term_in_term n i s t a in
+    |Predicate(s1, l), F(n)-> let rec aux2 i acc1 acc2 = function []-> (List.rev acc1, acc2) |a::tl-> let a, b = replace_term_in_term s n i t a in
       aux2 (i + 1) (a::acc1) (acc2@b) tl
                              in
                              let a,b = aux2 0 [] [] l in
@@ -64,6 +87,7 @@ let replace_term_by_variable_in_formula s t f =
                                    (Forall(s1, fp), l)
   in
   aux1 f t1;;
+
 
 let replace_term_by_position_in_term p t1 t2 =
   let tree = loop_term 0 0 t2 in

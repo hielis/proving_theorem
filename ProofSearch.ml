@@ -45,13 +45,22 @@ let rec search conclusion bound =
                                    in (th, computeUnary "$\\Rightarrow$ R" th tree)
                                 in search_aux {left= f1::conclusion.left; right = f2::(_rev q l)} (bound-1) succeed fail
                |Exists(s, f)-> let fp, lp = replace_term_by_variable_in_formula s (Variable(String.capitalize_ascii s)) f in
-                               let succeed ccl tree = 
+                               let succeed ccl tree =
                                  let r s f = replacement_by_positions (Variable(s)) f lp in
                                  let (a, b) = exists_right r ccl s in
                                  let th = sel_right a i b in
                                  (th, computeUnary "$\\exists$ R" th tree)
                                in search_aux {left = conclusion.left ; right = fp::(_rev q l)} (bound -1) succeed fail
-               |Predicate(s, f)-> fail () (*Unification Needed*)
+               |Forall(s, f) when (not (List.mem s (list_of_constants (_rev q l)))) ->
+                               let l_aux = (_rev q l) in
+                               let l_constants = list_of_constants (l_aux) in
+                               let t = Meta(String.capitalize_ascii s, l_constants) in
+                               let fp, lp = replace_term_by_variable_in_formula s t f in
+                               let succeed ccl tree =
+                                 let r s f = replacement_by_positions (Variable(s)) f lp in
+                                 let (a, b) = forall_right r ccl s in
+                                 let th = sel_left a i b in (th, computeUnary "$\\forall& R" th tree)
+                               in search_aux {left = fp::l_aux; right = conclusion.right} (bound-1) succeed fail
                |_->fail ()
 
 
@@ -89,12 +98,21 @@ let rec search conclusion bound =
                                  in search_aux {left=l_aux; right = f1::conclusion.right} (bound-1) succeed1 fail
                |Forall(s, f) -> let l_aux = (_rev q l) in
                                 let fp, lp = replace_term_by_variable_in_formula s (Variable(String.capitalize_ascii s)) f in
-                                let succeed ccl tree = 
+                                let succeed ccl tree =
                                   let r s f = replacement_by_positions (Variable(s)) f lp in
                                   let (a, b) = exists_right r ccl s in
                                   let th = sel_left a i b in (th, computeUnary "$\\forall& L" th tree)
                                 in search_aux {left = fp::l_aux; right = conclusion.right} (bound-1) succeed fail
-               |Predicate(s, l) -> fail () (*Unification needed*)
+               |Exists(s, f) when (not (List.mem s (list_of_constants (_rev q l)))) ->
+                                let l_aux = (_rev q l) in
+                                let l_constants = list_of_constants (l_aux) in
+                                let t = Meta(String.capitalize_ascii s, l_constants) in
+                                let fp, lp = replace_term_by_variable_in_formula s t f in
+                                let succeed ccl tree =
+                                  let r s f = replacement_by_positions (Variable(s)) f lp in
+                                  let (a, b) = exists_left r ccl s in
+                                  let th = sel_left a i b in (th, computeUnary "$\\exists& L" th tree)
+                                in search_aux {left = fp::l_aux; right = conclusion.right} (bound-1) succeed fail
                |_->fail ()
 
      in try_left_principal 0 [] conclusion.left

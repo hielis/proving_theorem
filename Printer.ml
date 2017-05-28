@@ -4,6 +4,7 @@ open Kernel.KERNEL
 module PRINTER = struct
 
 let rec term_to_string = function
+  |Meta(s, _) -> ("Meta("^(s^")"))
   |Variable(s)-> ("Var("^(s^")"))
   |Constant(s)-> ("Cons("^(s^")"))
   |Operator(s,l)-> (s^"(")^((term_list_to_string l)^")")

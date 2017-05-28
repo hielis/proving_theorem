@@ -77,4 +77,12 @@ let forall_left r th s = match th.left, th.right with [],_-> failwith "InvalidFA
                                                       | a::tl1, b::tl2-> ({left = th.left; right = tl1}, Forall(s,(r s a)))
 ;;
 
+let exists_left r th s = match th.left, th.right with [],_-> failwith "InvalidER1" |_,[]->failwith "InvalidER2"
+                                                       | a::tl1, b::tl2-> ({left = th.left; right = tl1}, Exists(s, (r s a)))
+;;
+
+let forall_right r th s = match th.left, th.right with [],_-> failwith "InvalidFAR1" |_,[]->failwith "InvalidFAR2"
+                                                      | a::tl1, b::tl2-> ({left = th.left; right = tl1}, Forall(s,(r s a)))
+;;
+
 end

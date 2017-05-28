@@ -3,6 +3,7 @@ module SYNTAX : sig
 exception UnificationImpossible
 
 type term = (*private*)
+| Meta of string * string list
 | Variable of string
 | Constant of string
 | Operator of string * term list
@@ -17,6 +18,9 @@ type formula = (*private*)
 
 val predicate : string -> term list -> formula (*A IMPLEMENTER*)
 val operator : string -> term list -> term (* A IMPLEMENTER*)
+val constant : string -> term
+val variable : string -> term
+val meta : string -> string list -> term
 
 val true_formula : unit -> formula
 val and_formula : formula -> formula -> formula

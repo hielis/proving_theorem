@@ -11,6 +11,8 @@ exception UnificationImpossible
 let rec replace_term s t = function
   |Variable(sp) when (String.equal s sp) -> t
   |Variable(sp) -> Variable(sp)
+  |Meta(sp, _) when (String.equal s sp) -> t
+  |Meta(sp, l) -> Meta(sp, l)
   |Constant(sp) -> Constant(sp)
   |Operator(sp, l) -> Operator(sp, List.map (replace_term s t) l);;
 
@@ -30,16 +32,26 @@ let rec concat_or b = function
   |[] -> b
   |hd::tl -> concat_or (b || hd) tl;;
 
-
 let rec is_present_in s = function
+  |Meta(sp, _) -> String.equal sp s
   |Variable(sp) -> String.equal sp s
   |Constant(sp) -> false
   |Operator(sp, l) -> concat_or false (List.map (is_present_in s) l);;
 
-let rec unify_term a t = match a, t with
+
+
+
+let rec unify_term a t =
+  let condition l = function Constant(b)-> (List.mem b l) | _ -> false in
+  match a, t with
+  |Meta(s, l),_ when (condition l t) -> raise UnificationImpossible
+  |Meta(s, l), _ when (is_present_in s t) -> raise UnificationImpossible
+  |Meta(s, l),_ -> (s, t)
   |Variable(s), _ when (is_present_in s t) -> raise UnificationImpossible
   |Variable(s),_ -> (s, t)
   |_, Variable(s) -> (s, a)
+  |_, Meta(s, l) when (condition l t) -> raise UnificationImpossible
+  |_, Meta(s, l) -> (s, a)
   |_, _ -> raise UnificationImpossible;;
 
 let unify_formula f1 f2 =
@@ -47,6 +59,7 @@ let unify_formula f1 f2 =
     |[], [] -> acc
     |t1::tl1, t2::tl2 -> (try (aux ((unify_term t1 t2)::acc) tl1 tl2) with _ -> aux acc tl1 tl2)
     |_,_ -> failwith "Predicates arguments are ill-sized" in
+
 let rec aux2 f1 f2 =
   match f1, f2 with
   |Predicate(s1, l1), Predicate(s2, l2) when (not (String.equal s1 s2)) -> raise UnificationImpossible
