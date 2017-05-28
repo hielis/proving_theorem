@@ -1,3 +1,4 @@
+open Syntax.SYNTAX
 open Kernel.KERNEL
 open Forest.FOREST
 open Generics.GENERICS
@@ -51,10 +52,10 @@ let rec search conclusion bound =
                                  let th = sel_right a i b in
                                  (th, computeUnary "$\\exists$ R" th tree)
                                in search_aux {left = conclusion.left ; right = fp::(_rev q l)} (bound -1) succeed fail
-               |Forall(s, f) when (not (List.mem s (list_of_constants (_rev q l)))) ->
+               |Forall(s, f) when (not (List.mem s (list_of_constants ((_rev q l)@(conclusion.left))))) ->
                                let l_aux = (_rev q l) in
-                               let l_constants = list_of_constants (l_aux) in
-                               let t = Meta(String.capitalize_ascii s, l_constants) in
+                               let l_constants = list_of_constants ((l_aux)@(conclusion.left)) in
+                               let t = meta (String.capitalize_ascii s) (l_constants) in
                                let fp, lp = replace_term_by_variable_in_formula s t f in
                                let succeed ccl tree =
                                  let r s f = replacement_by_positions (Variable(s)) f lp in
@@ -103,9 +104,9 @@ let rec search conclusion bound =
                                   let (a, b) = exists_right r ccl s in
                                   let th = sel_left a i b in (th, computeUnary "$\\forall& L" th tree)
                                 in search_aux {left = fp::l_aux; right = conclusion.right} (bound-1) succeed fail
-               |Exists(s, f) when (not (List.mem s (list_of_constants (_rev q l)))) ->
+               |Exists(s, f) when (not (List.mem s (list_of_constants ((_rev q l)@(conclusion.right))))) ->
                                 let l_aux = (_rev q l) in
-                                let l_constants = list_of_constants (l_aux) in
+                                let l_constants = list_of_constants (l_aux@conclusion.right) in
                                 let t = Meta(String.capitalize_ascii s, l_constants) in
                                 let fp, lp = replace_term_by_variable_in_formula s t f in
                                 let succeed ccl tree =
@@ -128,8 +129,8 @@ let s5 = {left = []; right=[Implies(Implies(Predicate("p",[]),Implies(Predicate(
 let s6 = {left=[]; right=[Implies(Implies(And(Predicate("p",[]),Predicate("q",[])),False),Or(Implies(Predicate("p",[]),False),Implies(Predicate("q",[]),False)))]};;
 let s7 = {left = []; right=[Implies(Or(And(Predicate("p1",[]),Predicate("q1",[])),And(Predicate("p2",[]),Predicate("q2",[]))),And(Or(Predicate("p1",[]),Predicate("p2",[])),Or(Predicate("q1",[]),Predicate("q2",[]))))]};;
 
-let main () = let a = {left = [True]; right = [False]} in
-                let rec aux i = try (search s6 i) with Fail->if i<1000 then aux (i+1) else (null_theorem (), leaf ()) in let (th,tree) = aux 0 in tree_to_latex tree;;
+let main () = let a = {left = [Exists("x", Forall("y", Predicate("p", [Variable("x") ; Variable("y")])))]; right = [Forall("y", Exists("x", Predicate("p", [Variable("x"); Variable("y")])))]} in
+                let rec aux i = try (search a i) with Fail->if i<1000 then aux (i+1) else (null_theorem (), leaf ()) in let (th,tree) = aux 0 in tree_to_latex tree;;
 
 end;;
 

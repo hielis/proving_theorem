@@ -64,7 +64,7 @@ let rec aux2 f1 f2 =
   match f1, f2 with
   |Predicate(s1, l1), Predicate(s2, l2) when (not (String.equal s1 s2)) -> raise UnificationImpossible
   |Predicate(s1, l1), Predicate(s2, l2) -> aux [] l1 l2
-  |_ -> failwith "Reduction failed and Unification was called too soon" in
+  |_ -> raise UnificationImpossible in
 
 let rec aux3 f1 f2 = function
   |[] -> (f1, f2)

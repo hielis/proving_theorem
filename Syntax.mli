@@ -16,8 +16,8 @@ type formula = (*private*)
 | Forall of string * formula
 | Exists of string * formula
 
-val predicate : string -> term list -> formula (*A IMPLEMENTER*)
-val operator : string -> term list -> term (* A IMPLEMENTER*)
+val predicate : string -> term list -> formula
+val operator : string -> term list -> term
 val constant : string -> term
 val variable : string -> term
 val meta : string -> string list -> term
@@ -29,5 +29,4 @@ val implies_formula : formula -> formula -> formula
 
 val true_formula : unit -> formula
 val false_formula : unit -> formula
-
 end
