@@ -130,7 +130,7 @@ let s6 = {left=[]; right=[Implies(Implies(And(Predicate("p",[]),Predicate("q",[]
 let s7 = {left = []; right=[Implies(Or(And(Predicate("p1",[]),Predicate("q1",[])),And(Predicate("p2",[]),Predicate("q2",[]))),And(Or(Predicate("p1",[]),Predicate("p2",[])),Or(Predicate("q1",[]),Predicate("q2",[]))))]};;
 
 let main () = let a = {left = [Exists("x", Forall("y", Predicate("p", [Variable("x") ; Variable("y")])))]; right = [Forall("y", Exists("x", Predicate("p", [Variable("x"); Variable("y")])))]} in
-                let rec aux i = try (search a i) with Fail->if i<1000 then aux (i+1) else (null_theorem (), leaf ()) in let (th,tree) = aux 0 in tree_to_latex tree;;
+                let rec aux i = try (search s7 i) with Fail->if i<1000 then aux (i+1) else (null_theorem (), leaf ()) in let (th,tree) = aux 0 in tree_to_latex tree;;
 
 end;;
 

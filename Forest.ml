@@ -18,7 +18,7 @@ let rec _ttl_aux = function
 ;;
 
 let tree_to_latex tree =
-  let head = "\\documentclass[10pt]{article} \\usepackage{bussproofs} \\usepackage{amssymb} \\usepackage{latexsym} \\begin{document} \\begin{prooftree} " in
+  let head = "\\documentclass[10pt, landscape]{article} \\usepackage{bussproofs} \\usepackage[utf8]{inputenc} \\usepackage[french]{babel} \\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry} \\usepackage{amssymb} \\usepackage{latexsym} \\begin{document} \\begin{prooftree} " in
   let tail = " \\end{prooftree} \\end{document}" in
   let latex_code = (head ^ (_ttl_aux tree))^tail in
   let latex_file = open_out "output/proof.tex" in
