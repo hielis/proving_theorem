@@ -5,8 +5,9 @@ module PRINTER = struct
 
 let rec term_to_string = function
   |Meta(s, _) -> ("Meta("^(s^")"))
-  |Variable(s)-> ("Var("^(s^")"))
-  |Constant(s)-> ("Cons("^(s^")"))
+  (* |Variable(s)-> ("Var("^(s^")")) *)
+  (* |Constant(s)-> ("Cons("^(s^")")) *)
+  |Variable s|Constant s -> s
   |Operator(s,l)-> (s^"(")^((term_list_to_string l)^")")
 and  _tlts_aux = function
   |[]->""
@@ -17,7 +18,8 @@ and term_list_to_string = function
 ;;
 
 let rec formula_to_string = function
-Predicate(s,l)->((s^"(")^(term_list_to_string l))^")"
+  |Predicate(s,[]) -> s
+  |Predicate(s,l)->((s^"(")^(term_list_to_string l))^")"
   |Or(f1,f2)->("("^(formula_to_string f1))^(" \\lor "^((formula_to_string f2)^")"))
   |And(f1,f2)->("("^(formula_to_string f1))^(" \\land "^((formula_to_string f2)^")"))
   |Implies(f1,f2)->("("^(formula_to_string f1))^(" \\Rightarrow "^((formula_to_string f2)^")"))
@@ -32,7 +34,7 @@ let rec _flts_aux = function
 ;;
 
 let formula_list_to_string = function
-|[]->"()";
+|[]->"\\emptyset";
 |t::q->(formula_to_string t)^(_flts_aux q)
 ;;
 

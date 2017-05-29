@@ -1,0 +1,3 @@
+Sys.command "ocamlbuild ProofSearch.cma" ;;
+#directory "_build" ;;
+#load "ProofSearch.cma" ;;
