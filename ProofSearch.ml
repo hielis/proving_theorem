@@ -21,36 +21,36 @@ let rec search conclusion bound =
                else
                let fail ()=try_right_principal (i+1) (t::l) q in
                match t with
-               |True->let (a,b)=true_right {left= conclusion.left; right = (_rev q l)} in let th = sel_right a i b in (th, computeUnary "$\\top$ R" th (leaf ()))
+               |True->let (a,b)=true_right {left= conclusion.left; right = (_rev q l)} in let th = sel_right a i b in (th, computeUnary "$\\top$R" th (leaf ()))
                |False->let succeed ccl tree =
                          let (a,b)=false_right ccl
                          in let th = sel_right a i b
-                         in (th, computeUnary "$\\bot$ R" th tree)
+                         in (th, computeUnary "$\\bot$R" th tree)
                        in search_aux {left= conclusion.left; right = (_rev q l)} (bound-1) succeed fail
                |Or(f1,f2)->let succeed ccl tree =
                               let (a,b)=or_right ccl
                               in let th = sel_right a i b
-                              in (th, computeUnary "$\\lor$ R" th tree)
+                              in (th, computeUnary "$\\lor$R" th tree)
                            in search_aux {left= conclusion.left; right = f1::f2::(_rev q l)} (bound-1) succeed fail
                |And(f1,f2)->let l_aux = (_rev q l)
                                in let succeed1 ccl1 tree1 =
                                   let succeed2 ccl2 tree2 =
                                      let (a,b)=(and_right ccl1 ccl2)
                                      in let th = sel_right a i b
-                                     in (th, computeBinary "$\\land$ R" th tree1 tree2)
+                                     in (th, computeBinary "$\\land$R" th tree1 tree2)
                                   in search_aux {left= conclusion.left; right = f2::l_aux} (bound-1) succeed2 fail
                                in search_aux {left=conclusion.left; right = f1::l_aux} (bound-1) succeed1 fail
                |Implies(f1,f2)->let succeed ccl tree =
                                    let (a,b)=implies_right ccl
                                    in let th = sel_right a i b
-                                   in (th, computeUnary "$\\Rightarrow$ R" th tree)
+                                   in (th, computeUnary "$\\Rightarrow$R" th tree)
                                 in search_aux {left= f1::conclusion.left; right = f2::(_rev q l)} (bound-1) succeed fail
                |Exists(s, f)-> let fp, lp = replace_term_by_variable_in_formula s (Variable(String.capitalize_ascii s)) f in
                                let succeed ccl tree =
                                  let r s f = replacement_by_positions (Variable(s)) f lp in
                                  let (a, b) = exists_right r ccl s in
                                  let th = sel_right a i b in
-                                 (th, computeUnary "$\\exists$ R" th tree)
+                                 (th, computeUnary "$\\exists$R" th tree)
                                in search_aux {left = conclusion.left ; right = fp::(_rev q l)} (bound -1) succeed fail
                |Forall(s, f) when (not (List.mem s (list_of_constants ((_rev q l)@(conclusion.left))))) ->
                                let l_aux = (_rev q l) in
@@ -60,7 +60,7 @@ let rec search conclusion bound =
                                let succeed ccl tree =
                                  let r s f = replacement_by_positions (Variable(s)) f lp in
                                  let (a, b) = forall_right r ccl s in
-                                 let th = sel_left a i b in (th, computeUnary "$\\forall& R" th tree)
+                                 let th = sel_left a i b in (th, computeUnary "$\\forall$R" th tree)
                                in search_aux {left = fp::l_aux; right = conclusion.right} (bound-1) succeed fail
                |_->fail ()
 
@@ -75,26 +75,26 @@ let rec search conclusion bound =
                |True->let succeed ccl tree =
                          let (a,b)=true_left ccl
                          in let th = sel_left a i b
-                         in (th, computeUnary "$\\top$ L" th tree)
+                         in (th, computeUnary "$\\top$L" th tree)
                       in search_aux {left= (_rev q l); right = conclusion.right} (bound-1) succeed fail
-               |False->let (a,b)=false_left {left= (_rev q l); right = conclusion.right} in let th = sel_left a i b in (th, computeUnary "$\\bot$ L" th (leaf ()))
+               |False->let (a,b)=false_left {left= (_rev q l); right = conclusion.right} in let th = sel_left a i b in (th, computeUnary "$\\bot$L" th (leaf ()))
                |And(f1,f2)->let succeed ccl tree  =
                                let (a,b)=and_left ccl
                                in let th = sel_left a i b
-                               in (th, computeUnary "$\\land$ L" th tree)
+                               in (th, computeUnary "$\\land$L" th tree)
                             in search_aux {left= f1::f2::(_rev q l); right = conclusion.right} (bound-1) succeed fail
                |Or(f1,f2)-> let l_aux =(_rev q l)
                             in let succeed1 ccl1 tree1 =
                                let succeed2 ccl2 tree2 =
                                  let (a,b)=(or_left ccl1 ccl2)
-                                 in let th = sel_left a i b in (th, computeBinary "$\\lor$ L" th tree1 tree2)
+                                 in let th = sel_left a i b in (th, computeBinary "$\\lor$L" th tree1 tree2)
                                in search_aux {left= f2::l_aux; right = conclusion.right} (bound-1) succeed2 fail
                             in search_aux {left=f1::l_aux; right = conclusion.right} (bound-1) succeed1 fail
                |Implies(f1,f2)-> let l_aux =(_rev q l)
                                  in let succeed1 ccl1 tree1 =
                                     let succeed2 ccl2 tree2 =
                                        let (a,b)=(implies_left ccl1 ccl2)
-                                       in let th = sel_left a i b in (th, computeBinary "$\\Rightarrow$ L" th tree1 tree2)
+                                       in let th = sel_left a i b in (th, computeBinary "$\\Rightarrow$L" th tree1 tree2)
                                     in search_aux {left= f2::l_aux; right = conclusion.right} (bound-1) succeed2 fail
                                  in search_aux {left=l_aux; right = f1::conclusion.right} (bound-1) succeed1 fail
                |Forall(s, f) -> let l_aux = (_rev q l) in
@@ -102,7 +102,7 @@ let rec search conclusion bound =
                                 let succeed ccl tree =
                                   let r s f = replacement_by_positions (Variable(s)) f lp in
                                   let (a, b) = exists_right r ccl s in
-                                  let th = sel_left a i b in (th, computeUnary "$\\forall& L" th tree)
+                                  let th = sel_left a i b in (th, computeUnary "$\\forall$L" th tree)
                                 in search_aux {left = fp::l_aux; right = conclusion.right} (bound-1) succeed fail
                |Exists(s, f) when (not (List.mem s (list_of_constants ((_rev q l)@(conclusion.right))))) ->
                                 let l_aux = (_rev q l) in
@@ -112,7 +112,7 @@ let rec search conclusion bound =
                                 let succeed ccl tree =
                                   let r s f = replacement_by_positions (Variable(s)) f lp in
                                   let (a, b) = exists_left r ccl s in
-                                  let th = sel_left a i b in (th, computeUnary "$\\exists& L" th tree)
+                                  let th = sel_left a i b in (th, computeUnary "$\\exists$L" th tree)
                                 in search_aux {left = fp::l_aux; right = conclusion.right} (bound-1) succeed fail
                |_->fail ()
 
@@ -129,14 +129,26 @@ let s5 = {left = []; right=[Implies(Implies(Predicate("p",[]),Implies(Predicate(
 let s6 = {left=[]; right=[Implies(Implies(And(Predicate("p",[]),Predicate("q",[])),False),Or(Implies(Predicate("p",[]),False),Implies(Predicate("q",[]),False)))]};;
 let s7 = {left = []; right=[Implies(Or(And(Predicate("p1",[]),Predicate("q1",[])),And(Predicate("p2",[]),Predicate("q2",[]))),And(Or(Predicate("p1",[]),Predicate("p2",[])),Or(Predicate("q1",[]),Predicate("q2",[]))))]};;
 
+let p l = Predicate("p",l)
+let q l = Predicate("q",l)
+let r l = Predicate("r",l)
+let s l = Predicate("s",l)
+let s8 = {left = [Forall("x", p[Variable "x"])]; right = [p[Constant "a"]]}
+
+let search_print s =
+  let rec aux i = try (search s i) with Fail->if i<1000 then aux (i+1) else (null_theorem (), leaf ()) in
+  let (th,tree) = aux 0 in
+  tree_to_latex tree
+
 let main () = let a = {left = [Exists("x", Forall("y", Predicate("p", [Variable("x") ; Variable("y")])))]; right = [Forall("y", Exists("x", Predicate("p", [Variable("x"); Variable("y")])))]} in
-                let rec aux i = try (search s7 i) with Fail->if i<1000 then aux (i+1) else (null_theorem (), leaf ()) in let (th,tree) = aux 0 in tree_to_latex tree;;
+  search_print s7
 
 end;;
 
-PROOFSEARCH.main ();;
+let () =
+  if not !Sys.interactive then PROOFSEARCH.main ();;
 
-(*tree_to_latex (Unary("$\\forall$ L", {left = [Predicate("p",[])]; right = [False;Predicate("p",[]);Forall("x",Predicate("P",[Variable("x")]))]},Leaf));;
+(*tree_to_latex (Unary("$\\forall$L", {left = [Predicate("p",[])]; right = [False;Predicate("p",[]);Forall("x",Predicate("P",[Variable("x")]))]},Leaf));;
 
 search  {left = [Predicate("p",[])]; right = [False;Predicate("p",[])]} 100;;
 
